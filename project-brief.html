@@ -1,0 +1,563 @@
+<!doctype html>
+<title>Dialog with Poet</title>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Literata:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Vazirmatn:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#faf6ea;
+    --surface:#f1ead6;
+    --surface-2:#e8dfc4;
+    --ink:#231e15;
+    --ink-soft:#5b5240;
+    --ink-faint:#8d8267;
+    --accent:#1f3a6e;
+    --accent-soft:#3d5a92;
+    --gold:#a3792f;
+    --gold-soft:#c9a35d;
+    --border:#ddd0a8;
+    --shadow: 0 1px 2px rgba(35,30,21,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14171f;
+      --surface:#1b2029;
+      --surface-2:#232a36;
+      --ink:#ece5d3;
+      --ink-soft:#b8af98;
+      --ink-faint:#7d7562;
+      --accent:#7ea0dd;
+      --accent-soft:#5c7fbd;
+      --gold:#cba756;
+      --gold-soft:#a3823f;
+      --border:#2d3542;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14171f;
+    --surface:#1b2029;
+    --surface-2:#232a36;
+    --ink:#ece5d3;
+    --ink-soft:#b8af98;
+    --ink-faint:#7d7562;
+    --accent:#7ea0dd;
+    --accent-soft:#5c7fbd;
+    --gold:#cba756;
+    --gold-soft:#a3823f;
+    --border:#2d3542;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Literata', Georgia, 'Times New Roman', serif;
+    font-size:17px;
+    line-height:1.7;
+    padding:0 20px;
+  }
+  .page{
+    max-width:720px;
+    margin:0 auto;
+    padding-block:56px 80px;
+  }
+  .fa{
+    font-family:'Vazirmatn', Tahoma, sans-serif;
+    direction:rtl;
+    unicode-bidi:isolate;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:500;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', Georgia, serif;
+    color:var(--ink);
+    text-wrap:balance;
+    font-weight:600;
+    line-height:1.15;
+  }
+  h1{
+    font-size:clamp(2.1rem, 5vw, 2.9rem);
+    margin:10px 0 6px;
+    font-optical-sizing:auto;
+  }
+  h1 .fa{
+    display:block;
+    font-size:0.5em;
+    font-weight:500;
+    color:var(--ink-soft);
+    margin-top:6px;
+  }
+  .tagline{
+    color:var(--ink-soft);
+    font-size:1.05rem;
+    max-width:52ch;
+    margin:0 0 4px;
+  }
+  .meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-top:18px;
+  }
+  header.hero{
+    padding-bottom:30px;
+  }
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:48px 0 28px;
+    color:var(--gold-soft);
+  }
+  .divider::before,.divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(to right, transparent, var(--border), transparent);
+  }
+  .divider svg{ width:11px; height:11px; flex:none; }
+
+  section{ margin-bottom:6px; }
+  h2{
+    font-size:1.45rem;
+    margin:0 0 14px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  h2 .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.55em;
+    color:var(--gold);
+    font-weight:500;
+  }
+  p{ margin:0 0 14px; max-width:64ch; }
+  strong{ color:var(--ink); font-weight:600; }
+  a{ color:var(--accent); text-decoration-color:var(--border); text-underline-offset:3px; }
+  a:hover{ text-decoration-color:var(--accent); }
+
+  .verdict{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:3px;
+    padding:18px 22px;
+    box-shadow:var(--shadow);
+  }
+  .verdict p:last-child{ margin-bottom:0; }
+  .verdict .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--accent-soft);
+    margin-bottom:8px;
+    display:block;
+  }
+
+  blockquote.verse{
+    margin:22px 0;
+    padding:16px 20px;
+    border-left:2px solid var(--gold);
+    background:var(--surface);
+    border-radius:2px;
+  }
+  blockquote.verse .fa{
+    font-size:1.15rem;
+    color:var(--ink);
+    line-height:2.1;
+    display:block;
+  }
+  blockquote.verse .gloss{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-top:10px;
+    font-style:normal;
+  }
+  blockquote.verse cite{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--gold);
+    font-style:normal;
+    display:block;
+    margin-top:8px;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  .tablewrap{ overflow-x:auto; margin:0 0 18px; }
+  th,td{
+    text-align:left;
+    padding:9px 12px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  th{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    font-weight:500;
+    white-space:nowrap;
+  }
+  td.gap{ color:var(--accent-soft); }
+
+  ul.additions{ list-style:none; margin:0 0 18px; padding:0; display:flex; flex-direction:column; gap:14px; }
+  ul.additions li{
+    padding-left:18px;
+    position:relative;
+    max-width:62ch;
+  }
+  ul.additions li::before{
+    content:"";
+    position:absolute; left:0; top:9px;
+    width:6px; height:6px;
+    background:var(--gold);
+    border-radius:50%;
+  }
+  ul.additions b{ color:var(--ink); font-weight:600; }
+
+  .pipeline{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:0;
+    margin:8px 0 22px;
+  }
+  .stage{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:12px 14px;
+    font-size:13px;
+    line-height:1.4;
+    flex:1 1 140px;
+    min-width:130px;
+  }
+  .stage .t{ font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:4px; }
+  .arrow{
+    flex:0 0 auto;
+    width:26px;
+    text-align:center;
+    color:var(--ink-faint);
+    font-size:15px;
+  }
+
+  .phase-list{ display:flex; flex-direction:column; gap:16px; margin-bottom:20px; }
+  .phase{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:14px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .phase:last-child{ border-bottom:none; padding-bottom:0; }
+  .phase .ph{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--gold);
+    letter-spacing:0.04em;
+    padding-top:2px;
+  }
+  .phase h3{ font-size:1.05rem; margin:0 0 4px; font-weight:600; }
+  .phase p{ margin:0; font-size:15px; color:var(--ink-soft); }
+
+  .questions{ display:flex; flex-direction:column; gap:12px; margin-bottom:6px; }
+  .q{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:13px 16px;
+  }
+  .q .qq{ font-weight:600; color:var(--ink); margin-bottom:3px; }
+  .q .qh{ font-size:14px; color:var(--ink-soft); }
+
+  footer{
+    margin-top:52px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    font-size:13px;
+    color:var(--ink-faint);
+  }
+  footer a{ color:var(--ink-faint); }
+
+  @media (prefers-reduced-motion: no-preference){
+    header.hero{ animation:rise .5s ease-out; }
+    @keyframes rise{ from{ opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Project Brief — v0.1</span>
+    <h1>Dialog with Poet<span class="fa">گفتگو با شاعر</span></h1>
+    <p class="tagline">A Persian-language chat companion that lets you pick a classical or modern Persian poet, pick a subject, and talk — grounded in their real verses, not an impression of them.</p>
+    <div class="meta">prepared for reza.bazargan · 2026-09-11 · scope discussion, pre-build</div>
+  </header>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">01</span>The idea, restated</h2>
+    <p>Pick a poet — Hafez, Rumi, Saadi, Attar, Khayyam — pick a topic — love, loss, wine, justice, the news of the day — and have a conversation with them in Persian. The poet answers in their own idiom, drawing on their actual poems rather than a generic imitation, and the app pulls in supporting material (biography, historical context, the tradition they wrote in) to keep the dialogue grounded rather than drifting into vague wisdom-speak.</p>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">02</span>My take</h2>
+    <div class="verdict">
+      <span class="label">Verdict</span>
+      <p>Worth building. The idea itself — "chat with a poet" — already exists in English, generically, ungrounded. Nobody has done it <strong>in Persian, grounded in a real corpus, across multiple poets, framed by topic.</strong> That combination is a genuine gap, and you already found the hardest missing piece: a 132,500-poem corpus with retrieval infrastructure built in. The main risk isn't technical, it's editorial — making each poet sound like themselves and not like a chatbot wearing a costume, and being honest with users that they're talking to a simulation, not the poet.</p>
+    </div>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">03</span>Who's already doing something like this</h2>
+    <p>Searched for existing "talk to a Persian poet" products before scoping this. Everything found is English-first, single-poet (almost always Rumi), and ungrounded — the model free-associates in the poet's general "vibe" rather than quoting or citing real poems.</p>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Product</th><th>Poets</th><th>Language</th><th>Gap vs. this idea</th></tr>
+      <tr><td><a href="https://character.ai/character/EWVyYfYz/wise-rumi-character" target="_blank" rel="noopener">Character.AI "Rumi"</a></td><td>Rumi only</td><td>English</td><td class="gap">Generic persona, no verse citations</td></tr>
+      <tr><td><a href="https://deepai.org/chat/rumi" target="_blank" rel="noopener">DeepAI Rumi Chat</a></td><td>Rumi only</td><td>English</td><td class="gap">Same — freeform "wisdom" voice</td></tr>
+      <tr><td>Sage / Orbofi / ai4chat "Rumi"</td><td>Rumi only</td><td>English</td><td class="gap">Interchangeable wisdom-bots</td></tr>
+      <tr><td>فال حافظ apps (Hafez fortune-draw)</td><td>Hafez only</td><td>Persian</td><td class="gap">One verse, no dialogue, no other poets</td></tr>
+      <tr><td><a href="https://ganjoor.net" target="_blank" rel="noopener">Ganjoor.net</a></td><td>234 poets</td><td>Persian</td><td class="gap">Full library, but a library — not a chatbot</td></tr>
+    </table>
+    </div>
+    <p>Nobody sits at the intersection: <strong>Persian-native · multiple poets · grounded in real corpus · organized by topic.</strong> That's the open lane.</p>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">04</span>What the original idea was missing</h2>
+    <ul class="additions">
+      <li><b>Grounding, not impression.</b> Without retrieval over real poems, the model will confidently invent verses that sound right and aren't — the single biggest way a "poet chatbot" loses trust. Every reply should be able to point at the actual poem it's drawing from.</li>
+      <li><b>A distinct voice per poet.</b> Hafez's ambiguous, wine-soaked ghazals, Rumi's ecstatic Masnavi, Saadi's moralist prose-poetry, Attar's allegorical Sufi tales, Khayyam's skeptical, carpe-diem quatrains — these need separate persona prompts and separate tone rules, not one "wise old poet" mask reused five times.</li>
+      <li><b>Context beyond the poems.</b> Biography, the historical moment, the Sufi or literary tradition a poet worked in, well-known commentary on ambiguous verses — this is what turns "recite a couplet" into an actual dialogue that can explain, contextualize, and disagree.</li>
+      <li><b>An honesty layer.</b> Persian poets, especially Hafez and Rumi, carry real spiritual weight for a lot of users. The app should be upfront that it's a simulation built from their words, not a channel to the person — a design and trust question, not just a technical one.</li>
+      <li><b>A distribution decision.</b> A web app is the natural MVP, but a large share of the Persian-speaking audience lives inside Telegram (and, inside Iran, Bale/Eitaa) rather than opening a browser — worth deciding early since it changes the interface layer.</li>
+      <li><b>Persian-first UI, not just Persian replies.</b> RTL layout, Persian typography (Vazirmatn or similar), and Nastaʿliq-adjacent visual language for the poet cards — the "communicate in Persian" requirement should shape the whole interface, not just the model's output language.</li>
+    </ul>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">05</span>The corpus you found</h2>
+    <p><a href="https://github.com/erfanbashar1/persian-poetry-ai-agent-plugin" target="_blank" rel="noopener">erfanbashar1/persian-poetry-ai-agent-plugin</a> converts the entire Ganjoor library into an agent-ready database: <strong>234 poets, ~132,500 poems</strong>, each poem a Markdown file with vocalized text, plain text, and a Persian summary, indexed for exact-line, Persian-semantic, and English-semantic search, exposed through an MCP server with local embeddings (Qwen3-Embedding, no external API needed for retrieval). Poetry is public domain; the Ganjoor compilation and summaries carry their own attribution requirement; the pipeline code is MIT.</p>
+    <p>This solves the hardest part — the corpus and retrieval layer — but it is a <strong>retrieval backend, not an app</strong>: no chat interface, no personas, no conversation memory, no topic framing. That's the layer this project adds on top.</p>
+
+    <div class="pipeline">
+      <div class="stage"><span class="t">01 · you</span>Pick a poet + a topic</div>
+      <div class="arrow">→</div>
+      <div class="stage"><span class="t">02 · persona</span>Poet-specific voice &amp; tone prompt</div>
+      <div class="arrow">→</div>
+      <div class="stage"><span class="t">03 · retrieval</span>Ganjoor corpus via MCP / semantic search</div>
+      <div class="arrow">→</div>
+      <div class="stage"><span class="t">04 · model</span>Persian-capable LLM composes the reply</div>
+      <div class="arrow">→</div>
+      <div class="stage"><span class="t">05 · you see</span>Reply + cited verse + Ganjoor link</div>
+    </div>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <blockquote class="verse">
+    <span class="fa">الا یا ایها الساقی ادر کاساً و ناولها<br>که عشق آسان نمود اول ولی افتاد مشکل‌ها</span>
+    <span class="gloss">Hafez, opening ghazal of the Divān — the kind of line the app should be able to quote exactly, not approximate.</span>
+    <cite>ganjoor.net / hafez</cite>
+  </blockquote>
+
+  <section>
+    <h2><span class="num">06</span>MVP — what to actually build first</h2>
+    <p>Narrowed further: <strong>Rumi only</strong> for the first working version, text-only, Persian-only, web chat, for a small circle of friends. Right call — it lets you prove the CORE prompt, retrieval, and memory pipeline against one persona before multiplying to five.</p>
+    <ul class="additions">
+      <li><b>Start with Rumi, add Hafez, Saadi, Attar, Khayyam once the pipeline holds.</b> All five personas are already fully drafted (§12) — adding a poet after Rumi is mostly a data-scoping exercise, not new engineering.</li>
+      <li><b>Per-poet source list, curated not exhaustive:</b> a handful of Ganjoor books per poet rather than everything they wrote — see §12 for the actual counts and where to be careful (Khayyam's two modern research editions especially).</li>
+      <li><b>Topic list has shifted from "literary" to "self-inquiry":</b> تعلق (attachment), ترس (fear), خشم (anger), تنهایی (loneliness), مرگ (death), معنای زندگی and 18 more (§12) — closer to poetry-assisted reflection than a literature Q&A, which is a stronger, more differentiated product than §01's original framing.</li>
+      <li><b>A poem only when it's relevant, never invented:</b> not every reply needs a verse, but any verse used must come from a verified retrieval source — the trust mechanism from §02 is intact, just not tied to "cite on every turn."</li>
+      <li><b>One visible disclosure:</b> a persistent, unobtrusive label that this is an AI simulation grounded in the poet's work, not the poet.</li>
+      <li><b>Web chat UI, RTL, Persian throughout, picks up where you left off</b> — no Telegram bot, no voice yet; cross-session memory is now in scope (§09).</li>
+    </ul>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">07</span>After the MVP</h2>
+    <div class="phase-list">
+      <div class="phase">
+        <span class="ph">Phase 2</span>
+        <div><h3>Widen &amp; deepen</h3><p>More poets from the 234-poet corpus; tune each persona against real usage; add a فال حافظ (Hafez divination draw) mode as a lighter, viral entry point into the same grounded engine.</p></div>
+      </div>
+      <div class="phase">
+        <span class="ph">Phase 3</span>
+        <div><h3>Go where the audience already is</h3><p>Telegram bot (and Bale/Eitaa if reach inside Iran matters), reusing the same persona + retrieval layer behind a different front end.</p></div>
+      </div>
+      <div class="phase">
+        <span class="ph">Phase 4</span>
+        <div><h3>Voice</h3><p>Persian TTS for the poet's replies — meaningful for classical poetry, which is meant to be heard, but only once the text experience earns it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">08</span>Decided</h2>
+    <div class="questions">
+      <div class="q"><div class="qq">Audience</div><div class="qh">You and your friends — a small, private circle, not a public product. Keeps hosting trivial and drops the need for heavy moderation or a formal consent flow, though the honesty disclosure from §04 stays.</div></div>
+      <div class="q"><div class="qq">Platform order</div><div class="qh">Web app first, optimized for the fastest possible pilot; Telegram bot afterward, reusing the same persona + retrieval layer behind a different front end (Phase 3, §07).</div></div>
+      <div class="q"><div class="qq">Poets</div><div class="qh">Hafez, Rumi, Saadi, Attar, Khayyam — all classical, all in the mystic/philosophical tradition (§06).</div></div>
+    </div>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">09</span>Tech stack for the pilot</h2>
+    <p>You already hold Streamlit, Gradio, and Railway accounts, so the stack below is scoped to those rather than introducing new platforms. Pricing checked September 2026 — API rates move often enough to re-check before committing to one.</p>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">The poet's brain — chat LLM</h3>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Option</th><th>Free tier</th><th>Paid rate (in/out per 1M tokens)</th><th>Persian quality</th></tr>
+      <tr><td>Gemini 2.5 Flash-Lite / Flash</td><td class="gap">Yes — no card, ~15 RPM / 1,000 RPD</td><td>$0 in free tier</td><td>Good, sometimes flatter register</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td>None (pay-as-you-go only)</td><td>$1 / $5</td><td>Strong — good at holding a tone</td></tr>
+      <tr><td>Claude Sonnet 5</td><td>None</td><td>$3 / $15</td><td>Best of this list for nuanced persona voice</td></tr>
+      <tr><td>OpenAI GPT-5.6 Luna</td><td>None</td><td>$0.20 / $1.20</td><td>Good, solid multilingual</td></tr>
+      <tr><td>Claude Opus 5 / GPT-6 Astra</td><td>None</td><td>$5–$10 / $25–$50</td><td>Top-tier, overkill for a friends pilot</td></tr>
+    </table>
+    </div>
+    <p style="max-width:64ch;"><strong>Suggested path:</strong> build the pipeline against Gemini's free tier first — zero cost while you're still iterating on prompts and retrieval — then switch the "brain" to Claude Haiku 4.5 or Sonnet 5 once the persona voice is what you actually care about getting right; that's the one place quality is worth paying for. At friends-group volume (a few dozen messages a day), even Sonnet 5 lands in the range of a few dollars a month.</p>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">Retrieval — searching the corpus</h3>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Option</th><th>Cost</th><th>Note</th></tr>
+      <tr><td>Qwen3-Embedding-0.6B (bundled in the corpus repo)</td><td class="gap">Free, runs locally</td><td>No API dependency; for 5 poets instead of 234 the index is small enough to run comfortably on a free-tier box</td></tr>
+      <tr><td>Hosted embedding API (OpenAI / Gemini)</td><td>~$0.02/1M tokens</td><td>Only worth it if running the local model on your host is inconvenient</td></tr>
+    </table>
+    </div>
+    <p style="max-width:64ch;">Skip the full MCP server for the pilot — it's built for agentic dev tools, not a chat app. Call the underlying search/embedding functions directly from your Streamlit or Gradio code, and trim the index down to just the five poets rather than all 234 to keep it light.</p>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">Front end &amp; hosting</h3>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Option</th><th>Free tier</th><th>Fit for this pilot</th></tr>
+      <tr><td>Streamlit Community Cloud</td><td class="gap">Yes — 1 private app free, sleeps after 12h idle</td><td>Native chat widgets, easiest custom layout for showing cited verses beside the reply</td></tr>
+      <tr><td>Gradio on Hugging Face Spaces</td><td class="gap">Yes — free CPU Basic space</td><td>Fastest to stand up a plain chat box; less layout control for citations</td></tr>
+      <tr><td>Railway</td><td>$5 one-time trial credit, then $1/mo free or $5/mo Hobby</td><td>Not needed for the web pilot — bring it in for Phase 3, since a Telegram bot needs an always-on process, unlike Streamlit/HF's sleep-on-idle free tiers</td></tr>
+    </table>
+    </div>
+    <p style="max-width:64ch;"><strong>Suggested path:</strong> Streamlit Community Cloud for the pilot — the chat-plus-citations layout it needs to earn trust (§06) is easier to build there than in Gradio's more constrained chat component. Save the Railway account for the Telegram phase, where python-telegram-bot or aiogram (both free, open-source) need a process that doesn't sleep — Railway's $5/mo Hobby plan comfortably covers that.</p>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">Persistence — picking up the conversation tomorrow</h3>
+    <p style="max-width:64ch;">New requirement, not in the original stack: Streamlit Community Cloud has no reliable persistent disk, so the conversation summary (§12's memory schema) needs a real store, plus a lightweight way to know which friend is talking. Simplest version: a name picker at login (no passwords needed for 5–6 friends) keying rows in a small hosted database.</p>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Option</th><th>Cost</th><th>Note</th></tr>
+      <tr><td>Supabase (hosted Postgres)</td><td class="gap">Free tier — 500MB, no card required</td><td>Open-source under the hood; store one row per (friend, poet) with the structured memory summary as JSON</td></tr>
+      <tr><td>SQLite on a Railway volume</td><td>Part of Railway usage</td><td>Only worth it once you're already paying for Railway in the Telegram phase</td></tr>
+    </table>
+    </div>
+    <p style="max-width:64ch;"><strong>Suggested path:</strong> Supabase free tier from day one — zero cost, and it carries straight through into the Telegram phase without a migration.</p>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">What this actually costs</h3>
+    <p style="max-width:64ch;">$20 comfortably covers this and then some. Streamlit, embeddings, and Supabase are $0 regardless of path. The only real spend is LLM calls — starting on Gemini's free tier makes the whole pilot free while you're building; switching to Claude Haiku 4.5 or Sonnet 5 once voice quality matters runs a few dollars a month at friends-group volume, so $20 is closer to a multi-month runway than a hard ceiling. If you want a genuinely $0 path throughout, an open-weight model (Qwen2.5 or Dorna, a Persian-tuned Llama) via a free-tier hosted endpoint is possible, but expect a real step down in how well it holds the persona's voice — worth it only if cost turns out to matter more than quality.</p>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">10</span>Source material beyond the poems</h2>
+    <p>Checked what Ganjoor actually holds per poet — three of your five wrote real <em>prose</em> alongside their verse, and it's the single best material for a dialogue bot, because it's the poet already talking in sentences instead of couplets. Worth pulling in on top of the verse corpus:</p>
+
+    <div class="tablewrap">
+    <table>
+      <tr><th>Poet</th><th>Add beyond the Divān</th><th>Why it matters here</th></tr>
+      <tr><td>Rumi</td><td><em>Fihi mā Fihi</em> (discourses), <em>Majāles-e Sab'e</em> (sermons), <em>Maktubāt</em> (letters) — all on Ganjoor</td><td>Rumi answering questions in plain prose — the closest existing thing to this bot's actual use case</td></tr>
+      <tr><td>Saadi</td><td><em>Golestān</em>'s prose frame-narrative (not just its embedded verses) — on Ganjoor</td><td>Saadi teaching through short prose anecdotes is exactly the register a "topic → response" chat wants</td></tr>
+      <tr><td>Attar</td><td><em>Tazkirat al-Awliyā</em>, his prose biographies of earlier Sufi saints — on Ganjoor</td><td>Shows Attar's own teaching voice and the tradition he's writing inside of</td></tr>
+      <tr><td>Hafez</td><td>No prose work exists; use Golandam's short preface to the Divān for biography instead</td><td>Keeps the bio layer primary-source rather than a modern write-up</td></tr>
+      <tr><td>Khayyam</td><td class="gap">Caveat, not a source</td><td>Quatrain authorship is genuinely disputed by scholars — worth having the bot note "attributed to" on contested ones rather than asserting authorship it can't back up</td></tr>
+    </table>
+    </div>
+
+    <p style="max-width:64ch;"><strong>Update:</strong> use <a href="https://github.com/ganjoor/ganjoor-data" target="_blank" rel="noopener">ganjoor/ganjoor-data</a> instead of the third-party plugin as the content source — it's the official raw export straight from Ganjoor (240 poets, 135,319 entries, clean per-poet JSON), and since Ganjoor's data model doesn't structurally separate "poem" from "prose" — everything is a category/entry under a poet — it almost certainly already carries <em>Fihi mā Fihi</em>, <em>Golestān</em>, and <em>Tazkirat al-Awliyā</em> without needing a separate scrape. Confirmed Rumi's own <code>poet.json</code> profile lists all three of his prose works by name. Worth treating the plugin repo's embedding/search code as an optional reference rather than the source of truth for content.</p>
+
+    <p style="max-width:64ch;">Two more additions worth the effort, outside Ganjoor: a short, <strong>hand-written biography and symbol-glossary per poet</strong> (Hafez's <span class="fa" style="font-size:1em;">می</span> as divine love rather than literal wine, Rumi's <span class="fa" style="font-size:1em;">نی</span> as the soul cut from its source) — not a bulk source, just a page or two per poet that makes retrieved verses land correctly instead of literally. And for Rumi specifically, <em>Maqālāt-e Shams</em> — the recorded sayings of Shams-e Tabrizi, the companion whose arrival triggered Rumi's whole transformation — sits outside Ganjoor but is public domain and worth tracking down for the historical-context layer from §04.</p>
+
+    <p style="max-width:64ch;">Stayed away from modern commentary and Wikipedia-style write-ups on purpose — sticking to the poets' own prose and centuries-old companion texts keeps everything public domain and keeps the voice the poet's own rather than a modern scholar's paraphrase of it.</p>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">11</span>Before you start building</h2>
+    <p>Everything structural is decided (§08). What's left is a short list of concrete calls — mostly content and product, not technology — that are cheap to answer now and expensive to unwind after you've written code around them.</p>
+
+    <div class="questions">
+      <div class="q"><div class="qq">Prose in v1, or verse-only?</div><div class="qh">§10's prose works (Fihi mā Fihi, Golestān, Tazkirat al-Awliyā) are the best dialogue material you have, but they need different chunking and citation handling than a couplet. Decide whether v1 includes them or defers to Phase 2 — don't let this get decided implicitly by whatever the data pipeline happens to pull in.</div></div>
+      <div class="q"><div class="qq">How strictly must a reply be grounded? <span style="color:var(--accent-soft);font-family:'IBM Plex Mono',monospace;font-size:11px;">— answered, §12</span></div><div class="qh">Hard constraint when a poem is used (never invented, always from verified retrieval); soft on whether a poem appears at all — most turns won't have one.</div></div>
+      <div class="q"><div class="qq">Who writes the five persona prompts? <span style="color:var(--accent-soft);font-family:'IBM Plex Mono',monospace;font-size:11px;">— answered, §12</span></div><div class="qh">Done — all five drafted, in depth, with a shared CORE prompt underneath them.</div></div>
+      <div class="q"><div class="qq">Single-turn replies, or does the poet remember the conversation?</div><div class="qh">A poet who forgets what you said two messages ago feels like a search engine; one who remembers needs a real conversation-history design, even at friends-group scale.</div></div>
+      <div class="q"><div class="qq">Is the pilot actually private?</div><div class="qh">Streamlit Community Cloud's free tier gives you one private app with an email allowlist — decide now whether that's how you're gating it, since a public URL by default is a different privacy posture than you may want for a friends-only pilot.</div></div>
+      <div class="q"><div class="qq">Whose API key, and what's the monthly ceiling?</div><div class="qh">One account holds the LLM billing. Worth setting a hard spend cap on it (most providers support this) before your friends start using it, not after.</div></div>
+      <div class="q"><div class="qq">What tells you the pilot worked?</div><div class="qh">A concrete signal — friends coming back a second time, a specific poet getting used more than others, a "this felt off" moment you can point to — decided now so Phase 2 is a response to real usage rather than a guess.</div></div>
+    </div>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <section>
+    <h2><span class="num">12</span>The persona document — and what it changes</h2>
+    <p><em>Salek_Poet_Agent_Personas_FA</em> is a real reframe, not an add-on, and a stronger product for it: the poet isn't answering questions about a topic, it's a <strong>mirror</strong> — a Socratic self-inquiry partner that uses the poet's worldview to help you see your own experience more clearly, never handing down a final answer. That moves this further from the generic "wisdom-bot" competitors in §03, not closer.</p>
+
+    <div class="verdict">
+      <span class="label">What it already gets right</span>
+      <p>A clean CORE / PERSONA / RUNTIME / SAFETY layering that matches §09's architecture exactly. A poem-grounding rule that's stricter than §06 originally asked for — quote only from <code>VERIFIED_POEMS</code>, or don't quote at all. Five genuinely distinct personas, each with its own "instinctive question" (Rumi: what remains when the story goes quiet; Hafez: are you fooling yourself with a beautiful name; Saadi: what changed in your behavior; Attar: what are you still clinging to; Khayyam: how do you know that), plus a "golden test" — one input, five different answers — to catch personas collapsing into the same voice. A structured memory summary (topic, experiences, observations, open hypotheses, open question, poems used) built for exactly the "continue tomorrow" requirement below. Real safety rules: no clinical diagnosis, redirect on self-harm, no encouraging dependency on the bot, explicit prompt-injection defense. A 10-point quality checklist and 8 adversarial test prompts to run before every release.</p>
+    </div>
+
+    <div class="tablewrap" style="margin-top:20px;">
+    <table>
+      <tr><th>Gap</th><th>Why it matters</th></tr>
+      <tr><td>No explicit "always reply in Persian" rule</td><td>Everything else assumes it, but nothing stops a friend typing in English from getting an English reply — worth one line in CORE</td></tr>
+      <tr><td>No user-facing disclosure wording</td><td>The document governs the model's internal stance well; §06's "visible disclosure" still needs actual UI copy, which this doc doesn't attempt</td></tr>
+      <tr><td>"Safe, direct response" on self-harm isn't written out</td><td>The rule to drop persona is there; what that response actually says is left blank — worth drafting once, not improvising live</td></tr>
+      <tr><td>Retrieval query formation isn't specified</td><td>The doc assumes <code>VERIFIED_POEMS</code> arrives pre-filled; how it's queried from topic + message + persona is the technical bridge to §09/§10 that still needs building</td></tr>
+    </table>
+    </div>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">On scoping each poet to a handful of Ganjoor books</h3>
+    <p style="max-width:64ch;">Yes — makes sense, and matches how the corpus should be scoped for a v1 anyway (§10). Curating 4–8 books per poet instead of their full Ganjoor catalog keeps the retrieval index small and every book hand-checkable before it's trusted. Attar's cut — Divān, Manteq al-Tayr, Mosibat-Nāmeh, Tazkirat al-Awliyā — is a good template: the most famous verse work, one more for thematic range, and the prose. One flag on Khayyam's four: <em>Rubā'iyāt-e Khayyām be pazhuhesh-e Mirafzali</em> and Sadegh Hedayat's <em>Tarānehā-ye Khayyām</em> aren't primary texts, they're modern scholarly curations of which quatrains are likely authentic — genuinely useful given how contested Khayyam's attribution is, but worth tagging with a different <code>confidence</code> value than the plain <em>Robā'iyāt</em> set, using the metadata schema the persona doc already defines in §9 of that document.</p>
+
+    <h3 style="font-size:1.05rem;margin:28px 0 10px;">Cross-session memory, in practice</h3>
+    <p style="max-width:64ch;">The persona doc's memory summarizer gives you the schema; §09's Supabase addition gives you where it lives. Concretely: one row per (friend, poet) holding the structured summary as JSON, loaded back in as <code>CONVERSATION_SUMMARY</code> on the next visit — the friend picks their name and the poet remembers where things were left, without replaying the whole transcript.</p>
+  </section>
+
+  <div class="divider"><svg viewBox="0 0 10 10"><path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor"/></svg></div>
+
+  <footer>
+    Corpus &amp; retrieval foundation: <a href="https://github.com/erfanbashar1/persian-poetry-ai-agent-plugin" target="_blank" rel="noopener">erfanbashar1/persian-poetry-ai-agent-plugin</a> (Ganjoor corpus, MIT-licensed code). Poetry: public domain. Compilation &amp; AI summaries: attribution required per the source repo's NOTICE.
+  </footer>
+
+</div>

@@ -1,0 +1,7 @@
+vendor/
+venv/
+.env
+data/memory/
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
