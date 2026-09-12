@@ -34,9 +34,19 @@ except ImportError:
 # raises in that case rather than acting like an empty dict, so this is expected
 # to no-op on your machine and only actually do something once deployed with
 # secrets configured on Streamlit Community Cloud.
+# This used to copy only GEMINI_API_KEY - a leftover from before Claude and
+# OpenAI existed as providers - so an OpenAI/Claude secret on Streamlit Cloud
+# was silently never picked up. Now copies every key llm.py's _provider()
+# actually checks.
+_SECRET_KEYS = (
+    "GEMINI_API_KEY", "GEMINI_MODEL",
+    "CLAUDE_API_KEY", "ANTHROPIC_API_KEY", "CLAUDE_MODEL",
+    "OPENAI_API_KEY", "OPENAI_MODEL",
+)
 try:
-    if "GEMINI_API_KEY" in st.secrets:
-        os.environ.setdefault("GEMINI_API_KEY", st.secrets["GEMINI_API_KEY"])
+    for _k in _SECRET_KEYS:
+        if _k in st.secrets:
+            os.environ.setdefault(_k, st.secrets[_k])
 except Exception:
     pass
 
@@ -103,10 +113,19 @@ div[data-testid="stChatInput"] textarea,
    case the sidebar is fixed-positioned rather than a flex child in this
    Streamlit version. st.sidebar itself is untouched functionally, so
    st.chat_input's pinned-to-bottom behavior (broken by the st.columns
-   experiment before) isn't at risk here. */
-[data-testid="stAppViewContainer"] { display: flex; flex-direction: row; }
-[data-testid="stSidebar"] { order: 2; right: 0 !important; left: auto !important; }
-[data-testid="stMain"], section.main { order: 1; }
+   experiment before) isn't at risk here.
+
+   Confirmed working on desktop, but forcing flex-direction: row
+   unconditionally broke mobile: Streamlit's own responsive layout normally
+   stacks the sidebar as a collapsible drawer below/above the main content
+   on narrow screens, and overriding that to a side-by-side row squeezed
+   both panes so tight that text wrapped one character per line. Scoping
+   this to wider screens only, so mobile keeps Streamlit's native stacking. */
+@media (min-width: 768px) {
+  [data-testid="stAppViewContainer"] { display: flex; flex-direction: row; }
+  [data-testid="stSidebar"] { order: 2; right: 0 !important; left: auto !important; }
+  [data-testid="stMain"], section.main { order: 1; }
+}
 </style>"""
 )
 
